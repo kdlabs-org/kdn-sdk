@@ -38,13 +38,13 @@
   "license": "MIT",
   "dependencies": {
     "@kadena/client": "^1.15.0",
-    "@kadena/types": "^0.7.0",
+    "@kadena/types": "^0.7.0"
+  },
+  "devDependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "rollup-plugin-typescript2": "^0.36.0",
-    "vm-browserify": "^1.1.2"
-  },
-  "devDependencies": {
+    "vm-browserify": "^1.1.2",
     "msw": "2.2.14",
     "@rollup/plugin-commonjs": "^24.0.0",
     "@rollup/plugin-node-resolve": "^15.0.0",
