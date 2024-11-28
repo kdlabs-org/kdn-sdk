@@ -25,7 +25,7 @@ module.exports = {
     }),
     commonjs(),
     typescript({
-      tsconfig: './tsconfig.sdk.json',
+      tsconfig: './tsconfig.json',
       useTsconfigDeclarationDir: true,
     }),
   ],

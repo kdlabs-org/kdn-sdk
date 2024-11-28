@@ -1,0 +1,46 @@
+{
+    "name": "kdn-sdk-example",
+    "version": "1.0.3",
+    "description": "A Example integrating KadenaNames SDK ",
+    "scripts": {
+      "build": "tsc -b tsconfig.json && vite build",
+      "dev": "vite",
+      "preview": "vite preview"
+    },
+    "bugs": {
+      "url": "https://github.com/kdlabs-org/kdn-sdk/issues"
+    },
+    "homepage": "https://github.com/kdlabs-org/kdn-sdk#readme",
+    "type": "module",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/kdlabs/kdn-sdk.git"
+    },
+    "keywords": [
+      "kadena",
+      "sdk",
+      "typescript",
+      "blockchain",
+      "decentralized",
+      "nameservice"
+    ],
+    "author": "Danillo <info@kdlaunch.com>",
+    "license": "MIT",
+    "dependencies": {
+      "@kadena/client": "^1.15.0",
+      "@kadena/types": "^0.7.0"
+    },
+    "devDependencies": {
+      "react": "^18.2.0",
+      "react-dom": "^18.2.0",
+      "@types/react": "^18.0.28",
+      "@types/react-dom": "^18.0.11",
+      "@vitejs/plugin-react": "^4.0.0",
+      "typescript": "^5.7.2",
+      "vite": "^4.0.0"
+    },
+    "peerDependencies": {
+      "typescript": ">=5.0.0"
+    }
+  }
+  

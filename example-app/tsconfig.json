@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "jsx": "react-jsx",
+    "strict": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "outDir": "./dist",
+    "noEmit": false,
+    "sourceMap": true,
+    "noFallthroughCasesInSwitch": true,
+    "types": ["node"],
+    "baseUrl": ".",
+    "paths": {
+      "@kdn-sdk/*": ["../src/*"]
+    }
+  },
+  "include": ["./**/*", "../src/**/*"],
+  "exclude": ["node_modules", "./dist", "./**/*.test.tsx", "./**/*.test.ts", "../src/**/*.test.ts", "../src/**/*.test.tsx"]
+}

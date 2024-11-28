@@ -2,3 +2,5 @@
 *.tsbuildinfo
 node_modules
 dist
+example_app/dist
+example_app/node_modules

@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import './index.css'
-import { kadenaNames } from '../index'
-import { debounce } from '../utils/debounce'
+import { kadenaNames } from '../src/index'
+import { debounce } from '../src/utils/debounce'
 
 function App() {
   const [nameInput, setNameInput] = useState('')
@@ -70,7 +70,6 @@ function App() {
             <option value="testnet04">Testnet04</option>
             <option value="testnet05">Testnet05</option>
             <option value="mainnet01">Mainnet01</option>
-            <option value="development">Development</option>
           </select>
         </div>
 

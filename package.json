@@ -6,16 +6,15 @@
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
   "scripts": {
-    "build:sdk": "tsc -p tsconfig.sdk.json && tsc -p tsconfig.sdk.cjs.json && npm run build:sdk:browser",
+    "build:sdk:esm": "tsc -p tsconfig.json",
+    "build:sdk:cjs": "tsc -p tsconfig.cjs.json",
     "build:sdk:browser": "rollup -c rollup.config.cjs",
-    "build:example": "tsc -b tsconfig.example.json && vite build",
+    "build:sdk": "npm run build:sdk:esm && npm run build:sdk:cjs && npm run build:sdk:browser",
     "build": "npm run build:sdk",
     "start": "ts-node src/sdk/index.ts",
-    "dev": "vite",
-    "test:sdk": "vitest run --config vitest.sdk.config.ts",
+    "test:sdk": "vitest run --config vitest.config.ts",
     "test": "npm run test:sdk",
-    "prepare": "npm run build",
-    "preview": "vite preview"
+    "prepare": "npm run build"
   },
   "bugs": {
     "url": "https://github.com/kdlabs-org/kdn-sdk/issues"
@@ -41,8 +40,6 @@
     "@kadena/types": "^0.7.0"
   },
   "devDependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
     "rollup-plugin-typescript2": "^0.36.0",
     "vm-browserify": "^1.1.2",
     "msw": "2.2.14",
@@ -53,7 +50,6 @@
     "@types/react-dom": "^18.0.11",
     "@typescript-eslint/eslint-plugin": "^8.16.0",
     "@typescript-eslint/parser": "^8.16.0",
-    "@vitejs/plugin-react": "^4.0.0",
     "@vitest/coverage-v8": "^2.1.6",
     "assert": "^2.0.0",
     "buffer": "^6.0.3",
@@ -68,7 +64,6 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2",
     "util": "^0.12.4",
-    "vite": "^4.0.0",
     "vitest": "^2.1.6"
   },
   "peerDependencies": {

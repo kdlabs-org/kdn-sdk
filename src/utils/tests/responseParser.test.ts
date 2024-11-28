@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { parseChainResponse } from '../responseParser'
 import type { ICommandResult } from '@kadena/client'
 
-import { IPactResultError, IPactResultSuccess } from 'src/types/types'
+import { IPactResultError, IPactResultSuccess } from '../../types/types'
 
 describe('parseChainResponse', () => {
   it('should return the data when the response status is success', () => {

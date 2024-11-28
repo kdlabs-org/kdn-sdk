@@ -6,9 +6,9 @@
     "target": "ES2020",
     "lib": ["ESNext", "DOM"],
     "strict": true,
-    "module": "ESNext",
+    "module": "CommonJS",
     "moduleResolution": "Node",
-    "outDir": "./dist/esm",
+    "outDir": "./dist/cjs",
     "rootDir": "./src",
     "declaration": true,
     "declarationMap": true,
@@ -16,6 +16,6 @@
     "esModuleInterop": true,
     "types": ["node", "vitest"]
   },
-  "include": ["src/**/*"],
+  "include": ["src"],
   "exclude": ["node_modules", "dist", "**/*.test.ts", "src/example-app", "src/example-code", "vitest.config.ts"]
 }
