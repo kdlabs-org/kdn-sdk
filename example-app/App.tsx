@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import './index.css'
 import { kadenaNames } from '../src/index'
-import { debounce } from '../src/utils/debounce'
+import { debounce } from './utils'
 
 function App() {
   const [nameInput, setNameInput] = useState('')
