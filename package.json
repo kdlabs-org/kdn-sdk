@@ -1,6 +1,6 @@
 {
   "name": "kdn-sdk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A TypeScript SDK for integrating human-readable addresses with KadenaNames on the Kadena blockchain.",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
