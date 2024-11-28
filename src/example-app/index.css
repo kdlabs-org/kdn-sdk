@@ -1,0 +1,195 @@
+/* index.css */
+
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* App Container */
+.app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Header Styling */
+.app-header {
+    background-color: #1a1a1a;
+    color: #fff;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    border-bottom: 1px solid #333;
+}
+
+.app-header h1 {
+    font-size: 2rem;
+    margin-bottom: 0.3rem;
+}
+
+.app-header p {
+    font-size: 0.9rem;
+    color: #ccc;
+}
+
+/* Main Content Styling */
+.main-content {
+    flex: 1;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Network Selector Styling */
+.network-selector {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.network-selector label {
+    margin-right: 0.5rem;
+    font-weight: 500;
+    color: #555;
+}
+
+.network-selector select {
+    flex: 1;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fafafa;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease;
+}
+
+.network-selector select:focus {
+    outline: none;
+    border-color: #888;
+}
+
+/* Converter Card Styling */
+.converter-card {
+    width: 100%;
+    max-width: 400px;
+    background-color: #fff;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.converter-card:hover {
+    border-color: #bbb;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.converter-card h2 {
+    font-size: 1.2rem;
+    margin-bottom: 0.8rem;
+    color: #222;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.input-group input {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #888;
+}
+
+.input-group button {
+    padding: 0.5rem;
+    background-color: #1a1a1a;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.input-group button:hover {
+    background-color: #333;
+}
+
+.result {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background-color: #f0f0f0;
+    border-left: 2px solid #1a1a1a;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    word-break: break-all;
+    color: #555;
+}
+
+.result strong {
+    color: #333;
+}
+
+/* Error Message Styling */
+.error {
+    width: 100%;
+    max-width: 400px;
+    background-color: #ffe6e6;
+    color: #cc0000;
+    padding: 0.8rem 1rem;
+    border: 1px solid #ffcccc;
+    border-radius: 4px;
+    margin-top: 0.5rem;
+    text-align: center;
+    font-size: 0.95rem;
+}
+
+/* Footer Styling */
+.app-footer {
+    background-color: #1a1a1a;
+    color: #ccc;
+    padding: 0.8rem 1rem;
+    text-align: center;
+    font-size: 0.8rem;
+    border-top: 1px solid #333;
+}
+
+/* Responsive Design */
+@media (max-width: 500px) {
+    .network-selector, .converter-card, .error {
+        max-width: 100%;
+    }
+}

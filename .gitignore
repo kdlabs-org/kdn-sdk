@@ -1,0 +1,4 @@
+# .gitignore
+*.tsbuildinfo
+node_modules
+dist
