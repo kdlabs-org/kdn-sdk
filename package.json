@@ -12,10 +12,15 @@
     "build": "npm run build:sdk",
     "start": "ts-node src/sdk/index.ts",
     "dev": "vite",
-    "test": "vitest",
+    "test:sdk": "vitest run --config vitest.sdk.config.ts",
+    "test": "npm run test:sdk",
     "prepare": "npm run build",
     "preview": "vite preview"
   },
+  "bugs": {
+    "url": "https://github.com/kdlabs-org/kdn-sdk/issues"
+  },
+  "homepage": "https://github.com/kdlabs-org/kdn-sdk#readme",
   "type": "module",
   "repository": {
     "type": "git",
@@ -40,6 +45,7 @@
     "vm-browserify": "^1.1.2"
   },
   "devDependencies": {
+    "msw": "2.2.14",
     "@rollup/plugin-commonjs": "^24.0.0",
     "@rollup/plugin-node-resolve": "^15.0.0",
     "@types/node": "^22.10.1",
@@ -72,7 +78,10 @@
     "dist",
     "src",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "!src/**/*.test.ts",
+    "!src/example-app",
+    "!src/example-code"
   ],
   "engines": {
     "node": ">=18.0.0"

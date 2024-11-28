@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import { useState, useMemo } from 'react'
 import './index.css'
-import { kadenaNames } from '../sdk'
+import { kadenaNames } from '../index'
+import { debounce } from '../utils/debounce'
 
 function App() {
   const [nameInput, setNameInput] = useState('')
@@ -10,38 +11,46 @@ function App() {
   const [error, setError] = useState<string | null>(null)
   const [networkId, setNetworkId] = useState('testnet04')
 
-  const handleNameToAddress = async () => {
-    setError(null)
-    setResolvedAddress(null)
-    setResolvedName(null)
+  const debouncedHandleNameToAddress = useMemo(
+    () =>
+      debounce(async (name: string, network: string) => {
+        setError(null)
+        setResolvedAddress(null)
+        setResolvedName(null)
 
-    try {
-      const address = await kadenaNames.nameToAddress(nameInput, networkId)
-      if (address) {
-        setResolvedAddress(address)
-      } else {
-        setError(`Address for ${nameInput} not found.`)
-      }
-    } catch (err: any) {
-      setError(err.message)
-    }
-  }
+        try {
+          const address = await kadenaNames.nameToAddress(name, network)
+          if (address) {
+            setResolvedAddress(address)
+          } else {
+            setError(`Address for ${name} not found.`)
+          }
+        } catch (err: any) {
+          setError(err.message)
+        }
+      }, 500),
+    []
+  )
 
-  const handleAddressToName = async () => {
-    setError(null)
-    setResolvedName(null)
+  const debouncedHandleAddressToName = useMemo(
+    () =>
+      debounce(async (address: string, network: string) => {
+        setError(null)
+        setResolvedName(null)
 
-    try {
-      const name = await kadenaNames.addressToName(addressInput, networkId)
-      if (name) {
-        setResolvedName(name)
-      } else {
-        setError(`Name for address ${addressInput} not found.`)
-      }
-    } catch (err: any) {
-      setError(err.message)
-    }
-  }
+        try {
+          const name = await kadenaNames.addressToName(address, network)
+          if (name) {
+            setResolvedName(name)
+          } else {
+            setError(`Name for address ${address} not found.`)
+          }
+        } catch (err: any) {
+          setError(err.message)
+        }
+      }, 500),
+    []
+  )
 
   return (
     <div className="app">
@@ -72,9 +81,11 @@ function App() {
               type="text"
               placeholder="e.g., alice.kda"
               value={nameInput}
-              onChange={(e) => setNameInput(e.target.value)}
+              onChange={(e) => {
+                setNameInput(e.target.value)
+                debouncedHandleNameToAddress(e.target.value, networkId)
+              }}
             />
-            <button onClick={handleNameToAddress}>Resolve</button>
           </div>
           {resolvedAddress && (
             <p className="result">
@@ -90,9 +101,11 @@ function App() {
               type="text"
               placeholder="e.g., 0x1234..."
               value={addressInput}
-              onChange={(e) => setAddressInput(e.target.value)}
+              onChange={(e) => {
+                setAddressInput(e.target.value)
+                debouncedHandleAddressToName(e.target.value, networkId)
+              }}
             />
-            <button onClick={handleAddressToName}>Resolve</button>
           </div>
           {resolvedName && (
             <p className="result">

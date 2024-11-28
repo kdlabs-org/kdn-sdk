@@ -1,4 +1,4 @@
-import { kadenaNames } from './index'
+import { kadenaNames } from '../index'
 
 async function run(): Promise<void> {
   const name = 'examplename.kda'

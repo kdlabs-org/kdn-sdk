@@ -12,5 +12,6 @@
   "references": [
     { "path": "./tsconfig.sdk.json" },
     { "path": "./tsconfig.example.json" }
-  ]
+  ],
+  "exclude": ["vitest.sdk.config.ts"]
 }

@@ -15,8 +15,9 @@ export default defineConfig({
       'assert': 'assert',
       'buffer': 'buffer',
       'process': 'process/browser',
-      'vm': 'vm-browserify',
+      'vm': 'vm-browserify'
     },
+    
   },
   build: {
     outDir: '../../dist/frontend',
@@ -28,5 +29,6 @@ export default defineConfig({
   },
   define: {
     global: 'window',
-  },
+  }
 });
+

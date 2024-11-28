@@ -36,13 +36,19 @@ These functionalities are encapsulated within the KadenaNames SDK, providing dev
 Install the KadenaNames SDK via npm:
 
 ```typescript
-npm install kdn-sdk
+pnpm add kdn-sdk
 ```
 
 Or using yarn:
 
 ```typescript
 yarn add kdn-sdk
+```
+
+or using npm
+
+```typescript
+npm install kdn-sdk
 ```
 
 ## Quick Start
@@ -52,7 +58,7 @@ Here's a simple example to get you started with the KadenaNames SDK.
 ## Import the SDK
 
 ```typescript
-import { kdnSdk } from 'kdn-sdk'
+import { kadenaNames } from 'kdn-sdk'
 ```
 
 ## Convert Name to Address
@@ -63,7 +69,7 @@ async function resolveName() {
   const networkId = 'testnet04'
 
   try {
-    const address = await kdnSdk.nameToAddress(name, networkId)
+    const address = await kadenaNames.nameToAddress(name, networkId)
     console.log(`Address for ${name}: ${address}`)
   } catch (error) {
     console.error(error)
@@ -81,7 +87,7 @@ async function resolveAddress() {
   const networkId = 'testnet04'
 
   try {
-    const name = await kdnSdk.addressToName(address, networkId)
+    const name = await kadenaNames.addressToName(address, networkId)
     console.log(`Name for ${address}: ${name}`)
   } catch (error) {
     console.error(error)
@@ -156,5 +162,6 @@ Contributions are welcome! Please open an issue or submit a pull request for any
 
 MIT
 
-##Contact
-For any inquiries or support, please reach out to support@kadenanames.com.
+## Contact
+
+For any inquiries or support, please reach out to info@kdlaunch.com.

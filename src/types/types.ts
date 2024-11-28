@@ -12,3 +12,33 @@ export interface ChainwebHostGeneratorOptions {
 export type ChainwebHostGenerator = (
   options: ChainwebHostGeneratorOptions
 ) => string
+
+export declare interface IPactInt {
+  int: string
+}
+export declare interface IPactDecimal {
+  decimal: string
+}
+
+export declare type PactValue =
+  | PactLiteral
+  | Array<PactValue>
+  | Record<string, any>
+
+export declare type PactLiteral =
+  | string
+  | number
+  | IPactInt
+  | IPactDecimal
+  | boolean
+  | Date
+
+export declare interface IPactResultSuccess {
+  status: 'success'
+  data: PactValue
+}
+
+export declare interface IPactResultError {
+  status: 'failure'
+  error: object
+}
