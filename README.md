@@ -143,10 +143,6 @@ nameToAddress(name: string, networkId: string): Promise<string | null>
 
 Retrieves the Kadena address associated with a specific Kadena name.
 
-**Configuration**
-
-Custom Chainweb Host Generator
-By default, the SDK uses a predefined Chainweb host generator. However, you can provide a custom generator to support additional networks or specific configurations.
 
 ## Contributing
 
