@@ -120,7 +120,7 @@ Example:
 
 ```typescript
 
-const address = await kadenaNamesSDK.nameToAddress('alice.kda', 'testnet04');
+const address = await kadenaNames.nameToAddress('alice.kda', 'testnet04');
 console.log(address); // Outputs: k:123456789....abcdef
 addressToName(address: string, networkId: string): Promise<string | null>
 ```
@@ -136,7 +136,7 @@ Returns: A promise that resolves to the corresponding name or null if not found.
 Example:
 
 ```typescript
-const name = await kadenaNamesSDK.addressToName('0x123456789abcdef','testnet04')
+const name = await kadenaNames.addressToName('0x123456789abcdef','testnet04')
 console.log(name) // Outputs: alice.kda
 nameToAddress(name: string, networkId: string): Promise<string | null>
 ```
