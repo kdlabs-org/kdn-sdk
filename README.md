@@ -177,10 +177,12 @@ nameToAddress(name: string, networkId: string): Promise<string | null>
 ```
 
 Converts a Kadena name to its corresponding blockchain address.
-• Parameters:
-• name: The Kadena name (e.g., alice.kda).
-• networkId: The network identifier (e.g., testnet04, mainnet01).
-• Returns: A promise that resolves to the corresponding address or null if not found.
+**Parameters**
+
+ - name: The Kadena name (e.g., alice.kda). 
+ - networkId: The network
+   identifier (e.g., testnet04, mainnet01). 
+   Returns: A promise that resolves to the corresponding address or null if not found.
 
 ```typescript
 addressToName(address: string, networkId: string): Promise<string | null>
