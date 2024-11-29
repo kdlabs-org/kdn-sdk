@@ -42,3 +42,17 @@ export declare interface IPactResultError {
   status: 'failure'
   error: object
 }
+
+export interface NameInfo {
+  price: number
+  marketPrice: number
+  isAvailable: boolean
+  isForSale: boolean
+  expiryDate?: string | Date | null
+  lastPrice?: number
+}
+
+export interface SaleState {
+  sellable: boolean
+  price: number
+}

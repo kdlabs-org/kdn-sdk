@@ -23,7 +23,7 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kdlabs/kdn-sdk.git"
+    "url": "https://github.com/kdlabs-org/kdn-sdk.git"
   },
   "keywords": [
     "kadena",
