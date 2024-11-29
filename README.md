@@ -222,7 +222,7 @@ Fetches detailed information about a Kadena name.
  - owner: The address of the owner. 
  - Returns: A NameInfo object containing details such as price,availability, and sale status.
 
-```typescript\
+```typescript
 fetchPriceByPeriod(period: 1 | 2, networkId: string, owner: string): Promise
 ```
 
