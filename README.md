@@ -196,8 +196,8 @@ Retrieves the Kadena name associated with a specific blockchain address.
  - networkId: The network identifier (e.g., testnet04, mainnet01).
  - Returns: A promise that resolves to the corresponding name or null if not found.
 
-```
-typescriptfetchSaleState(name: string, networkId: string): Promise<{ sellable: boolean; price: number }>
+```typescript
+fetchSaleState(name: string, networkId: string): Promise<{ sellable: boolean; price: number }>
 ```
 
 Fetches the sale state of a given Kadena name.
