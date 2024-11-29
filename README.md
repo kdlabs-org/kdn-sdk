@@ -1,3 +1,4 @@
+
 # KadenaNames SDK
 
 ## Introduction
@@ -186,42 +187,51 @@ addressToName(address: string, networkId: string): Promise<string | null>
 ```
 
 Retrieves the Kadena name associated with a specific blockchain address.
-• Parameters:
-• address: The Kadena blockchain address.
-• networkId: The network identifier (e.g., testnet04, mainnet01).
-• Returns: A promise that resolves to the corresponding name or null if not found.
+
+**Parameters:**
+
+ - address: The Kadena blockchain address.
+ - networkId: The network identifier (e.g., testnet04, mainnet01).
+ - Returns: A promise that resolves to the corresponding name or null if not found.
 
 ```
 typescriptfetchSaleState(name: string, networkId: string): Promise<{ sellable: boolean; price: number }>
 ```
 
 Fetches the sale state of a given Kadena name.
-• Parameters:
-• name: The Kadena name (e.g., example.kda).
-• networkId: The network identifier (e.g., testnet04, mainnet01).
-• Returns: An object containing sellable (boolean) and price (number).
+
+**Parameters**
+
+ - name: The Kadena name (e.g., example.kda). 
+ - networkId: The network identifier (e.g., testnet04, mainnet01). 
+ - Returns: An object
+   containing sellable (boolean) and price (number).
 
 ```typescript
 fetchNameInfo(name: string, networkId: string, owner: string): Promise
 ```
 
 Fetches detailed information about a Kadena name.
-• Parameters:
-• name: The Kadena name (e.g., example.kda).
-• networkId: The network identifier (e.g., testnet04, mainnet01).
-• owner: The address of the owner.
-• Returns: A NameInfo object containing details such as price, availability, and sale status.
+
+**Parameters:**
+
+ - name: The Kadena name (e.g., example.kda). 
+ - networkId: The network identifier (e.g., testnet04, mainnet01). 
+ - owner: The address of the owner. 
+ - Returns: A NameInfo object containing details such as price,availability, and sale status.
 
 ```typescript\
 fetchPriceByPeriod(period: 1 | 2, networkId: string, owner: string): Promise
 ```
 
 Fetches the registration price for a specific period (1 or 2 years).
-• Parameters:
-• period: 1 for one year or 2 for two years.
-• networkId: The network identifier.
-• owner: The owner’s address.
-• Returns: The registration price for the specified period.
+
+**Parameters:**
+
+ - period: 1 for one year or 2 for two years. 
+ - networkId: The network identifier. 
+ - owner: The owner’s address. 
+ - Returns: The registration price for the specified period.
 
 ## Contributing
 
