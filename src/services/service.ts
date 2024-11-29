@@ -116,11 +116,12 @@ export const fetchSaleState = async (
   networkHost: string
 ): Promise<SaleState> => {
   try {
+    const formattedName = ensureKdaExtension(name)
     const module = getNamespaceModule(networkId)
     const chainId = getChainIdByNetwork(networkId)
 
     const transaction = Pact.builder
-      .execution((Pact as any).modules[module]['get-sale-state'](name))
+      .execution((Pact as any).modules[module]['get-sale-state'](formattedName))
       .setMeta({
         chainId,
         senderAccount: 'account',
