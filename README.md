@@ -245,11 +245,6 @@ Retrieves the Kadena name associated with a specific blockchain address.
 - `address`: The Kadena blockchain address.
 - `networkId`: The network identifier.
 
-
-```typescript
-fetchSaleState(name: string, networkId: string): Promise<{ sellable: boolean; price: number }>
-```
-
 **Returns:**
 A promise that resolves to:
 
