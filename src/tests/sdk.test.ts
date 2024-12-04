@@ -1,8 +1,22 @@
 import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
-import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  describe,
+  expect,
+  it,
+  vi
+} from 'vitest'
 import { kadenaNames } from '../sdk'
 import { ChainId } from '@kadena/types'
+
+// Mock the defaultChainwebHostGenerator to return a fixed host URL
+import * as hosts from '../hosts/hosts'
+vi.spyOn(hosts, 'defaultChainwebHostGenerator').mockImplementation(
+  () => 'https://api.testnet.chainweb.com'
+)
 
 const server = setupServer()
 
@@ -62,6 +76,8 @@ function setupServerResponse(
         const body =
           typeof responseData === 'string' ? responseData : 'Invalid response'
         return HttpResponse.text(body, { status: 200 })
+      } else if (responseType === 'networkError') {
+        return HttpResponse.error()
       }
       return undefined
     })
@@ -77,7 +93,7 @@ function getLocalUrl(networkId: string, chainId: ChainId): string {
   return `${host}/api/v1/local`
 }
 
-describe('KadenaNames', () => {
+describe('KadenaNames SDK', () => {
   describe('nameToAddress', () => {
     it('should return address for registered name on mainnet', async () => {
       const networkId = 'mainnet01'
@@ -110,12 +126,14 @@ describe('KadenaNames', () => {
 
       const result = await kadenaNames.nameToAddress('turkiye.kda', networkId)
 
-      expect(result).toBe(
+      expect(result.success).toBe(true)
+      expect(result.data).toBe(
         'k:af5b9003f37c64ac178f324b1ce8e45e6080b4fa40710bf7f3cd3661a4dd1eb6'
       )
+      expect(result.error).toBeUndefined()
     })
 
-    it('should return null for unregistered name on mainnet', async () => {
+    it('should return error for unregistered name on mainnet', async () => {
       const networkId = 'mainnet01'
       const chainId = '15'
       const url = getLocalUrl(networkId, chainId)
@@ -140,10 +158,15 @@ describe('KadenaNames', () => {
         'unregistered.kda',
         networkId
       )
-      expect(result).toBeNull()
+
+      expect(result.success).toBe(false)
+      expect(result.data).toBeUndefined()
+      expect(result.error).toBe(
+        'Failed to resolve address for identifier "unregistered.kda"'
+      )
     })
 
-    it('should return null when result status is failure with different error', async () => {
+    it('should return error when result status is failure with different error', async () => {
       const networkId = 'mainnet01'
       const chainId = '15'
       const url = getLocalUrl(networkId, chainId)
@@ -165,7 +188,12 @@ describe('KadenaNames', () => {
       setupServerResponse(url, 'json', responseData)
 
       const result = await kadenaNames.nameToAddress('some.kda', networkId)
-      expect(result).toBeNull()
+
+      expect(result.success).toBe(false)
+      expect(result.data).toBeUndefined()
+      expect(result.error).toBe(
+        'Failed to resolve address for identifier "some.kda"'
+      )
     })
   })
 
@@ -197,16 +225,23 @@ describe('KadenaNames', () => {
         }
       })
 
-      setupServerResponse(url, 'json', responseData)
+      server.use(
+        http.post(url, (req) => {
+          return HttpResponse.json(responseData, { status: 200 })
+        })
+      )
 
       const result = await kadenaNames.addressToName(
         'k:af5b9003f37c64ac178f324b1ce8e45e6080b4fa40710bf7f3cd3661a4dd1eb6',
         networkId
       )
-      expect(result).toBe('turkiye.kda')
+
+      expect(result.success).toBe(true)
+      expect(result.data).toBe('turkiye.kda')
+      expect(result.error).toBeUndefined()
     })
 
-    it('should return null for unregistered address on mainnet', async () => {
+    it('should return error for unregistered address on mainnet', async () => {
       const networkId = 'mainnet01'
       const chainId = '15'
       const url = getLocalUrl(networkId, chainId)
@@ -231,10 +266,15 @@ describe('KadenaNames', () => {
         'k:unknownaddress',
         networkId
       )
-      expect(result).toBeNull()
+
+      expect(result.success).toBe(false)
+      expect(result.data).toBeUndefined()
+      expect(result.error).toBe(
+        'Failed to resolve name for identifier "k:unknownaddress"'
+      )
     })
 
-    it('should return null when result status is failure with different error', async () => {
+    it('should return error when result status is failure with different error', async () => {
       const networkId = 'mainnet01'
       const chainId = '15'
       const url = getLocalUrl(networkId, chainId)
@@ -256,7 +296,12 @@ describe('KadenaNames', () => {
       setupServerResponse(url, 'json', responseData)
 
       const result = await kadenaNames.addressToName('k:someaddress', networkId)
-      expect(result).toBeNull()
+
+      expect(result.success).toBe(false)
+      expect(result.data).toBeUndefined()
+      expect(result.error).toBe(
+        'Failed to resolve name for identifier "k:someaddress"'
+      )
     })
   })
 })

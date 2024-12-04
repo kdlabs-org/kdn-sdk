@@ -1,4 +1,3 @@
-
 # KadenaNames SDK
 
 ## Introduction
@@ -17,7 +16,7 @@ KadenaNames is a decentralized, on-chain solution that provides human-readable a
 
 ### How Does It Work?
 
-KadenaNames offers two primary ways to interact with human-readable names:
+KadenaNames offers multiple ways to interact with human-readable names:
 
 1. **Name to Address**: Convert a user-friendly name (e.g., `alice.kda`) into its corresponding blockchain address.
 2. **Address to Name**: Retrieve the human-readable name associated with a specific blockchain address.
@@ -27,45 +26,55 @@ KadenaNames offers two primary ways to interact with human-readable names:
 
 These functionalities are encapsulated within the KadenaNames SDK, providing developers with straightforward methods to integrate name resolution into their applications.
 
+---
+
 ## Features
 
 - **TypeScript Support**: Fully typed for enhanced developer experience and type safety.
 - **Simple Integration**: Easy-to-use methods for name resolution without the need for complex configurations.
 - **Modular Design**: Organized structure promoting maintainability and scalability.
-- **Error Handling**: Comprehensive error logging using native `console` methods.
+- **Error Handling**: Comprehensive error logging.
 - **Customization**: Optional customization of Chainweb host generators to support various networks.
+
+---
 
 ## Installation
 
-Install the KadenaNames SDK via npm:
+Install the KadenaNames SDK via your preferred package manager:
 
-```typescript
-pnpm add kdn-sdk
-```
+### Using `npm`:
 
-Or using yarn:
-
-```typescript
-yarn add kdn-sdk
-```
-
-or using npm
-
-```typescript
+```bash
 npm install kdn-sdk
 ```
 
+### Using `yarn`:
+
+```bash
+yarn add kdn-sdk
+```
+
+### Using `pnpm`:
+
+```bash
+pnpm add kdn-sdk
+```
+
+---
+
 ## Quick Start
 
-Here's a simple example to get you started with the KadenaNames SDK.
+Here’s a quick example to get started with the KadenaNames SDK.
 
-## Import the SDK
+### Import the SDK
 
 ```typescript
 import { kadenaNames } from 'kdn-sdk'
 ```
 
-## Convert Name to Address
+---
+
+### Convert Name to Address
 
 ```typescript
 async function resolveName() {
@@ -73,8 +82,14 @@ async function resolveName() {
   const networkId = 'testnet04'
 
   try {
-    const address = await kadenaNames.nameToAddress(name, networkId)
-    console.log(`Address for ${name}: ${address}`)
+    const response = await kadenaNames.nameToAddress(name, networkId)
+    if (response.success && response.data) {
+      console.log(`Address for ${name}: ${response.data}`)
+    } else if (response.success && !response.data) {
+      console.log(`Address for ${name} not found.`)
+    } else {
+      console.error(`Error resolving address: ${response.error}`)
+    }
   } catch (error) {
     console.error(error)
   }
@@ -83,7 +98,9 @@ async function resolveName() {
 resolveName()
 ```
 
-## Convert Address to Name
+---
+
+### Convert Address to Name
 
 ```typescript
 async function resolveAddress() {
@@ -91,16 +108,25 @@ async function resolveAddress() {
   const networkId = 'testnet04'
 
   try {
-    const name = await kadenaNames.addressToName(address, networkId)
-    console.log(`Name for ${address}: ${name}`)
+    const response = await kadenaNames.addressToName(address, networkId)
+    if (response.success && response.data) {
+      console.log(`Name for ${address}: ${response.data}`)
+    } else if (response.success && !response.data) {
+      console.log(`Name for ${address} not found.`)
+    } else {
+      console.error(`Error resolving name: ${response.error}`)
+    }
   } catch (error) {
     console.error(error)
   }
 }
+
 resolveAddress()
 ```
 
-## Fetch Sale State
+---
+
+### Fetch Sale State
 
 ```typescript
 async function fetchSaleState() {
@@ -108,8 +134,14 @@ async function fetchSaleState() {
   const networkId = 'testnet04'
 
   try {
-    const saleState = await kadenaNames.fetchSaleState(name, networkId)
-    console.log(`Sellable: ${saleState.sellable}, Price: ${saleState.price}`)
+    const response = await kadenaNames.fetchSaleState(name, networkId)
+    if (response.success && response.data) {
+      console.log(
+        `Sellable: ${response.data.sellable}, Price: ${response.data.price}`
+      )
+    } else {
+      console.error(`Error fetching sale state: ${response.error}`)
+    }
   } catch (error) {
     console.error(`Error fetching sale state: ${error.message}`)
   }
@@ -118,7 +150,9 @@ async function fetchSaleState() {
 fetchSaleState()
 ```
 
-## Fetch Name Info
+---
+
+### Fetch Name Info
 
 ```typescript
 async function fetchNameInfo() {
@@ -127,8 +161,12 @@ async function fetchNameInfo() {
   const owner = 'owner-address'
 
   try {
-    const nameInfo = await kadenaNames.fetchNameInfo(name, networkId, owner)
-    console.log('Name Info:', nameInfo)
+    const response = await kadenaNames.fetchNameInfo(name, networkId, owner)
+    if (response.success && response.data) {
+      console.log('Name Info:', response.data)
+    } else {
+      console.error(`Error fetching name info: ${response.error}`)
+    }
   } catch (error) {
     console.error(`Error fetching name info: ${error.message}`)
   }
@@ -137,7 +175,9 @@ async function fetchNameInfo() {
 fetchNameInfo()
 ```
 
-## Fetch Price By Period
+---
+
+### Fetch Price By Period
 
 ```typescript
 async function fetchPriceByPeriod() {
@@ -145,19 +185,27 @@ async function fetchPriceByPeriod() {
   const owner = 'owner-address'
 
   try {
-    const priceForOneYear = await kadenaNames.fetchPriceByPeriod(
+    const responseOneYear = await kadenaNames.fetchPriceByPeriod(
       1,
       networkId,
       owner
     )
-    console.log(`Price for 1 year: ${priceForOneYear}`)
+    if (responseOneYear.success && responseOneYear.data !== undefined) {
+      console.log(`Price for 1 year: ${responseOneYear.data}`)
+    } else {
+      console.error(`Error fetching 1-year price: ${responseOneYear.error}`)
+    }
 
-    const priceForTwoYears = await kadenaNames.fetchPriceByPeriod(
+    const responseTwoYears = await kadenaNames.fetchPriceByPeriod(
       2,
       networkId,
       owner
     )
-    console.log(`Price for 2 years: ${priceForTwoYears}`)
+    if (responseTwoYears.success && responseTwoYears.data !== undefined) {
+      console.log(`Price for 2 years: ${responseTwoYears.data}`)
+    } else {
+      console.error(`Error fetching 2-year price: ${responseTwoYears.error}`)
+    }
   } catch (error) {
     console.error(`Error fetching price: ${error.message}`)
   }
@@ -166,89 +214,129 @@ async function fetchPriceByPeriod() {
 fetchPriceByPeriod()
 ```
 
+---
+
 ## API Documentation
 
-## KadenaNames SDK
-
-The main class provides the following methods to interact with KadenaNames.
-
-```typescript
-nameToAddress(name: string, networkId: string): Promise<string | null>
-```
+### **nameToAddress**
 
 Converts a Kadena name to its corresponding blockchain address.
-**Parameters**
 
- - name: The Kadena name (e.g., alice.kda). 
- - networkId: The network
-   identifier (e.g., testnet04, mainnet01). 
-   Returns: A promise that resolves to the corresponding address or null if not found.
+**Parameters:**
+
+- `name`: The Kadena name (e.g., `alice.kda`).
+- `networkId`: The network identifier (e.g., `testnet04`, `mainnet01`).
+
+**Returns:**
+A promise that resolves to:
 
 ```typescript
-addressToName(address: string, networkId: string): Promise<string | null>
+{ success: boolean; data?: string; error?: string }
 ```
+
+---
+
+### **addressToName**
 
 Retrieves the Kadena name associated with a specific blockchain address.
 
 **Parameters:**
 
- - address: The Kadena blockchain address.
- - networkId: The network identifier (e.g., testnet04, mainnet01).
- - Returns: A promise that resolves to the corresponding name or null if not found.
+- `address`: The Kadena blockchain address.
+- `networkId`: The network identifier.
+
+<<<<<<< Updated upstream
 
 ```typescript
 fetchSaleState(name: string, networkId: string): Promise<{ sellable: boolean; price: number }>
 ```
 
-Fetches the sale state of a given Kadena name.
-
-**Parameters**
-
- - name: The Kadena name (e.g., example.kda). 
- - networkId: The network identifier (e.g., testnet04, mainnet01). 
- - Returns: An object
-   containing sellable (boolean) and price (number).
+=======
+**Returns:**
+A promise that resolves to:
 
 ```typescript
-fetchNameInfo(name: string, networkId: string, owner: string): Promise
+{ success: boolean; data?: string; error?: string }
 ```
+
+---
+
+### **fetchSaleState**
+
+> > > > > > > Stashed changes
+
+Fetches the sale state of a given Kadena name.
+
+**Parameters:**
+
+- `name`: The Kadena name.
+- `networkId`: The network identifier.
+
+**Returns:**
+A promise that resolves to:
+
+```typescript
+{ success: boolean; data?: { sellable: boolean; price: number }; error?: string }
+```
+
+---
+
+### **fetchNameInfo**
 
 Fetches detailed information about a Kadena name.
 
 **Parameters:**
 
- - name: The Kadena name (e.g., example.kda). 
- - networkId: The network identifier (e.g., testnet04, mainnet01). 
- - owner: The address of the owner. 
- - Returns: A NameInfo object containing details such as price,availability, and sale status.
+- `name`: The Kadena name.
+- `networkId`: The network identifier.
+- `owner`: The owner's blockchain address.
+
+**Returns:**
+A promise that resolves to:
 
 ```typescript
-fetchPriceByPeriod(period: 1 | 2, networkId: string, owner: string): Promise
+{ success: boolean; data?: NameInfo; error?: string }
 ```
+
+---
+
+### **fetchPriceByPeriod**
 
 Fetches the registration price for a specific period (1 or 2 years).
 
 **Parameters:**
 
- - period: 1 for one year or 2 for two years. 
- - networkId: The network identifier. 
- - owner: The owner’s address. 
- - Returns: The registration price for the specified period.
+- `period`: 1 for one year, 2 for two years.
+- `networkId`: The network identifier.
+- `owner`: The owner’s address.
+
+**Returns:**
+A promise that resolves to:
+
+```typescript
+{ success: boolean; data?: number; error?: string }
+```
+
+---
 
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request for any enhancements or bug fixes.
 
 1. Fork the repository.
-2. Create your feature branch: git checkout -b feature/YourFeature
-3. Commit your changes: git commit -m 'Add some feature'
-4. Push to the branch: git push origin feature/YourFeature
+2. Create your feature branch: `git checkout -b feature/YourFeature`
+3. Commit your changes: `git commit -m 'Add some feature'`
+4. Push to the branch: `git push origin feature/YourFeature`
 5. Open a pull request.
+
+---
 
 ## License
 
 MIT
 
+---
+
 ## Contact
 
-For any inquiries or support, please reach out to info@kdlaunch.com.
+For any inquiries or support, please reach out to **info@kdlaunch.com**.

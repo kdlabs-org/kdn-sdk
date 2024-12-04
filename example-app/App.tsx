@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import './index.css'
-import { kadenaNames } from '../src/index'
+import { kadenaNames } from '../dist/esm'
 import { debounce } from './utils'
 
 function App() {
@@ -14,6 +14,12 @@ function App() {
   } | null>(null)
   const [nameInfo, setNameInfo] = useState<any>(null)
   const [priceByPeriod, setPriceByPeriod] = useState<number | null>(null)
+  const [transactionOutput, setTransactionOutput] = useState<string | null>(
+    null
+  )
+  const [affiliateTransactionOutput, setAffiliateTransactionOutput] = useState<
+    string | null
+  >(null)
   const [error, setError] = useState<string | null>(null)
   const [networkId, setNetworkId] = useState('testnet04')
 
@@ -22,17 +28,21 @@ function App() {
       debounce(async (name: string, network: string) => {
         setError(null)
         setResolvedAddress(null)
-        setResolvedName(null)
 
-        try {
-          const address = await kadenaNames.nameToAddress(name, network)
-          if (address) {
-            setResolvedAddress(address)
+        if (!name.trim()) {
+          setError('Please enter a valid name.')
+          return
+        }
+
+        const response = await kadenaNames.nameToAddress(name, network)
+        if (response.success) {
+          if (response.data) {
+            setResolvedAddress(response.data)
           } else {
             setError(`Address for ${name} not found.`)
           }
-        } catch (err: any) {
-          setError(err.message)
+        } else {
+          setError(response.error || 'An unexpected error occurred.')
         }
       }, 500),
     []
@@ -44,15 +54,20 @@ function App() {
         setError(null)
         setResolvedName(null)
 
-        try {
-          const name = await kadenaNames.addressToName(address, network)
-          if (name) {
-            setResolvedName(name)
+        if (!address.trim()) {
+          setError('Please enter a valid address.')
+          return
+        }
+
+        const response = await kadenaNames.addressToName(address, network)
+        if (response.success) {
+          if (response.data) {
+            setResolvedName(response.data)
           } else {
             setError(`Name for address ${address} not found.`)
           }
-        } catch (err: any) {
-          setError(err.message)
+        } else {
+          setError(response.error || 'An unexpected error occurred.')
         }
       }, 500),
     []
@@ -67,11 +82,11 @@ function App() {
     setError(null)
     setSaleState(null)
 
-    try {
-      const state = await kadenaNames.fetchSaleState(nameInput, networkId)
-      setSaleState(state)
-    } catch (err: any) {
-      setError(`Error fetching sale state: ${err.message}`)
+    const response = await kadenaNames.fetchSaleState(nameInput, networkId)
+    if (response.success && response.data) {
+      setSaleState(response.data)
+    } else {
+      setError(response.error || 'Failed to fetch sale state.')
     }
   }
 
@@ -84,15 +99,17 @@ function App() {
     setError(null)
     setNameInfo(null)
 
-    try {
-      const info = await kadenaNames.fetchNameInfo(
-        nameInput,
-        networkId,
-        'owner-address'
-      )
-      setNameInfo(info)
-    } catch (err: any) {
-      setError(`Error fetching name info: ${err.message}`)
+    const owner = 'owner-address' // Replace with actual owner address
+
+    const response = await kadenaNames.fetchNameInfo(
+      nameInput,
+      networkId,
+      owner
+    )
+    if (response.success && response.data) {
+      setNameInfo(response.data)
+    } else {
+      setError(response.error || 'Failed to fetch name info.')
     }
   }
 
@@ -100,15 +117,81 @@ function App() {
     setError(null)
     setPriceByPeriod(null)
 
+    const owner = 'owner-address' // Replace with actual owner address
+
+    const response = await kadenaNames.fetchPriceByPeriod(
+      period,
+      networkId,
+      owner
+    )
+    if (response.success && response.data !== undefined) {
+      setPriceByPeriod(response.data)
+    } else {
+      setError(response.error || 'Failed to fetch price.')
+    }
+  }
+
+  const handlePrepareTransaction = async () => {
+    if (!nameInput.trim() || !addressInput.trim()) {
+      setError('Please provide both name and address.')
+      return
+    }
+
+    setError(null)
+    setTransactionOutput(null)
+
     try {
-      const price = await kadenaNames.fetchPriceByPeriod(
-        period,
+      const owner = 'owner-address' // Replace with actual owner address
+      const registrationPeriod = 1 // Defaulting to 1-year registration
+      const account = 'account-id' // Replace with actual account ID
+
+      const transaction = await kadenaNames.createRegisterNameTransaction(
+        owner,
+        addressInput,
+        nameInput,
+        registrationPeriod,
         networkId,
-        'owner-address'
+        account
       )
-      setPriceByPeriod(price)
-    } catch (err: any) {
-      setError(`Error fetching price: ${err.message}`)
+
+      if (transaction) {
+        setTransactionOutput(JSON.stringify(transaction, null, 2))
+      } else {
+        setError('Failed to prepare the transaction.')
+      }
+    } catch (err) {
+      setError((err as Error).message || 'An unexpected error occurred.')
+    }
+  }
+
+  const handlePrepareAffiliateTransaction = () => {
+    if (!nameInput.trim() || !addressInput.trim()) {
+      setError('Please provide both affiliate name and fee address.')
+      return
+    }
+
+    setError(null)
+    setAffiliateTransactionOutput(null)
+
+    try {
+      const fee = 5.0 // Example affiliate fee
+      const adminKey = 'admin-key' // Replace with actual admin key
+
+      const transaction = kadenaNames.createAddAffiliateTransaction(
+        nameInput,
+        addressInput,
+        fee,
+        adminKey,
+        networkId
+      )
+
+      if (transaction) {
+        setAffiliateTransactionOutput(JSON.stringify(transaction, null, 2))
+      } else {
+        setError('Failed to prepare the affiliate transaction.')
+      }
+    } catch (err) {
+      setError((err as Error).message || 'An unexpected error occurred.')
     }
   }
 
@@ -145,7 +228,7 @@ function App() {
           <div className="input-group">
             <input
               type="text"
-              placeholder="e.g., 0x1234..."
+              placeholder="e.g., k:1234abcd..."
               value={addressInput}
               onChange={(e) => {
                 setAddressInput(e.target.value)
@@ -157,6 +240,65 @@ function App() {
             <p className="result">
               <strong>{addressInput}:</strong> {resolvedName}
             </p>
+          )}
+        </div>
+
+        <div className="converter-card">
+          <h2>Prepare Registration Transaction</h2>
+          <div className="input-group">
+            <input
+              type="text"
+              placeholder="Name to register"
+              value={nameInput}
+              onChange={(e) => setNameInput(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Blockchain address"
+              value={addressInput}
+              onChange={(e) => setAddressInput(e.target.value)}
+            />
+          </div>
+          <button className="action-button" onClick={handlePrepareTransaction}>
+            Prepare Transaction
+          </button>
+          {transactionOutput && (
+            <textarea
+              className="transaction-output"
+              value={transactionOutput}
+              readOnly
+            />
+          )}
+        </div>
+
+        <div className="converter-card">
+          <h2>Prepare Affiliate Transaction</h2>
+          <div className="input-group">
+            <input
+              type="text"
+              placeholder="Affiliate name"
+              value={nameInput}
+              onChange={(e) => setNameInput(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Fee address"
+              value={addressInput}
+              onChange={(e) => setAddressInput(e.target.value)}
+            />
+          </div>
+          <button
+            className="action-button"
+            onClick={handlePrepareAffiliateTransaction}
+          >
+            Prepare Affiliate Transaction
+          </button>
+          {affiliateTransactionOutput && (
+            <textarea
+              className="transaction-output"
+              value={affiliateTransactionOutput}
+              readOnly
+            />
           )}
         </div>
 
@@ -185,6 +327,13 @@ function App() {
               <strong>Available:</strong> {nameInfo.isAvailable ? 'Yes' : 'No'}{' '}
               <br />
               <strong>For Sale:</strong> {nameInfo.isForSale ? 'Yes' : 'No'}
+              <br />
+              {nameInfo.expiryDate && (
+                <>
+                  <strong>Expiry Date:</strong>{' '}
+                  {new Date(nameInfo.expiryDate).toLocaleDateString()} <br />
+                </>
+              )}
             </div>
           )}
         </div>

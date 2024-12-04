@@ -7,6 +7,17 @@ import {
   SaleState
 } from './types/types'
 import { PRICE_MAP } from './constants/kdn'
+import { ChainId, ICommand, IUnsignedCommand } from '@kadena/types'
+import { ITransactionDescriptor } from '@kadena/client'
+
+/**
+ * Define a standardized SDK response type.
+ */
+export interface SDKResponse<T> {
+  success: boolean
+  data?: T
+  error?: string
+}
 
 /**
  * The main SDK class for interacting with KadenaNames.
@@ -36,7 +47,7 @@ export class KadenaNamesSDK {
     const result = this._chainwebHostGenerator(options)
     if (!result) {
       throw new Error(
-        'Failed to generate chainweb url using chainwebHostGenerator method'
+        'Failed to generate Chainweb URL using chainwebHostGenerator method'
       )
     }
     return result
@@ -48,10 +59,18 @@ export class KadenaNamesSDK {
    * @param networkId - The network identifier (e.g., 'testnet04', 'mainnet01').
    * @returns The address corresponding to the name, or null if not found.
    */
-  async nameToAddress(name: string, networkId: string): Promise<string | null> {
+  async nameToAddress(
+    name: string,
+    networkId: string
+  ): Promise<SDKResponse<string | null>> {
     const chainId = service.getChainIdByNetwork(networkId)
     const host = this.getChainwebUrl({ networkId, chainId })
-    return await service.nameToAddress(name, networkId, host)
+
+    const response = await service.nameToAddress(name, networkId, host)
+    if (response.success) {
+      return { success: true, data: response.data }
+    }
+    return { success: false, error: response.error }
   }
 
   /**
@@ -63,10 +82,15 @@ export class KadenaNamesSDK {
   async addressToName(
     address: string,
     networkId: string
-  ): Promise<string | null> {
+  ): Promise<SDKResponse<string | null>> {
     const chainId = service.getChainIdByNetwork(networkId)
     const host = this.getChainwebUrl({ networkId, chainId })
-    return await service.addressToName(address, networkId, host)
+
+    const response = await service.addressToName(address, networkId, host)
+    if (response.success) {
+      return { success: true, data: response.data }
+    }
+    return { success: false, error: response.error }
   }
 
   /**
@@ -75,10 +99,18 @@ export class KadenaNamesSDK {
    * @param networkId - The network identifier (e.g., 'testnet04', 'mainnet01').
    * @returns The sale state of the name, including its price and availability.
    */
-  async fetchSaleState(name: string, networkId: string): Promise<SaleState> {
+  async fetchSaleState(
+    name: string,
+    networkId: string
+  ): Promise<SDKResponse<SaleState>> {
     const chainId = service.getChainIdByNetwork(networkId)
     const host = this.getChainwebUrl({ networkId, chainId })
-    return await service.fetchSaleState(name, networkId, host)
+
+    const response = await service.fetchSaleState(name, networkId, host)
+    if (response.success) {
+      return { success: true, data: response.data }
+    }
+    return { success: false, error: response.error }
   }
 
   /**
@@ -92,10 +124,15 @@ export class KadenaNamesSDK {
     name: string,
     networkId: string,
     owner: string
-  ): Promise<NameInfo> {
+  ): Promise<SDKResponse<NameInfo>> {
     const chainId = service.getChainIdByNetwork(networkId)
     const host = this.getChainwebUrl({ networkId, chainId })
-    return await service.fetchNameInfo(name, networkId, owner, host)
+
+    const response = await service.fetchNameInfo(name, networkId, owner, host)
+    if (response.success) {
+      return { success: true, data: response.data }
+    }
+    return { success: false, error: response.error }
   }
 
   /**
@@ -109,10 +146,160 @@ export class KadenaNamesSDK {
     period: keyof typeof PRICE_MAP,
     networkId: string,
     owner: string
-  ): Promise<number> {
+  ): Promise<SDKResponse<number>> {
     const chainId = service.getChainIdByNetwork(networkId)
     const host = this.getChainwebUrl({ networkId, chainId })
-    return await service.fetchPriceByPeriod(period, networkId, owner, host)
+
+    const response = await service.fetchPriceByPeriod(
+      period,
+      networkId,
+      owner,
+      host
+    )
+    if (response.success) {
+      return { success: true, data: response.data }
+    }
+    return { success: false, error: response.error }
+  }
+
+  /**
+   * Prepares a transaction for adding a new affiliate.
+   *
+   * This SDK function constructs a high-level interface for creating an unsigned
+   * transaction for adding an affiliate. The transaction must be signed and submitted separately.
+   *
+   * @param affiliateName - The name of the affiliate.
+   * @param feeAddress - The blockchain address where affiliate fees will be sent.
+   * @param fee - The fee percentage to be allocated to the affiliate.
+   * @param adminKey - The governance key to authorize the operation.
+   * @param networkId - The network identifier (e.g., "testnet04", "mainnet01").
+   * @returns A ServiceResponse containing either the unsigned transaction or an error message.
+   */
+  createAddAffiliateTransaction(
+    affiliateName: string,
+    feeAddress: string,
+    fee: number,
+    adminKey: string,
+    networkId: string
+  ): SDKResponse<IUnsignedCommand> {
+    try {
+      const transaction = service.prepareAddAffiliateTransaction(
+        affiliateName,
+        feeAddress,
+        fee,
+        adminKey,
+        networkId
+      )
+
+      if (!transaction) {
+        return {
+          success: false,
+          error: `Failed to create a transaction for adding affiliate "${affiliateName}".`
+        }
+      }
+
+      return {
+        success: true,
+        data: transaction
+      }
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'An unexpected error occurred while creating the transaction.'
+
+      console.error('Error in createAddAffiliateTransaction:', errorMessage)
+
+      return {
+        success: false,
+        error: `Error creating transaction for affiliate "${affiliateName}": ${errorMessage}`
+      }
+    }
+  }
+
+  /**
+   * Creates a transaction for registering a Kadena name.
+   *
+   * This SDK function constructs a high-level interface for creating an unsigned
+   * transaction for registering a Kadena name. The transaction must be signed
+   * and submitted separately.
+   *
+   * @param owner - The account that owns the name being registered.
+   * @param address - The blockchain address to associate with the name.
+   * @param name - The Kadena name to register (e.g., "example.kda").
+   * @param registrationPeriod - The registration period (key from PRICE_MAP, e.g., 1 for 1 year).
+   * @param networkId - The network identifier (e.g., "testnet04", "mainnet01").
+   * @param account - The account performing the transaction.
+   * @returns A ServiceResponse containing either the unsigned transaction or an error message.
+   */
+  async createRegisterNameTransaction(
+    owner: string,
+    address: string,
+    name: string,
+    registrationPeriod: keyof typeof PRICE_MAP,
+    networkId: string,
+    account: string
+  ): Promise<SDKResponse<IUnsignedCommand | null>> {
+    try {
+      const chainId = service.getChainIdByNetwork(networkId)
+      const host = this.getChainwebUrl({ networkId, chainId })
+
+      const transaction = await service.prepareRegisterNameTransaction(
+        owner,
+        address,
+        name,
+        registrationPeriod,
+        networkId,
+        account,
+        host
+      )
+
+      if (!transaction) {
+        return {
+          success: false,
+          error: `Failed to create a transaction for registering name "${name}".`
+        }
+      }
+
+      return {
+        success: true,
+        data: transaction
+      }
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'An unexpected error occurred while creating the transaction.'
+
+      console.error('Error in createRegisterNameTransaction:', errorMessage)
+
+      return {
+        success: false,
+        error: `Error creating transaction for registering name "${name}": ${errorMessage}`
+      }
+    }
+  }
+
+  /**
+   * Submits a signed transaction to the Kadena blockchain.
+   * @param transaction - The signed transaction object.
+   * @param networkId - The network identifier (e.g., 'testnet04', 'mainnet01').
+   * @param chainId - The chain ID for the transaction (e.g., '1', '15').
+   * @returns A promise that resolves to a standardized SDK response containing the transaction descriptor.
+   */
+  async sendTransaction(
+    transaction: ICommand,
+    networkId: string,
+    chainId: ChainId
+  ): Promise<SDKResponse<ITransactionDescriptor>> {
+    try {
+      const host = this.getChainwebUrl({ networkId, chainId })
+      const result = await service.sendTransaction(transaction, host)
+      return { success: true, data: result }
+    } catch (error) {
+      console.error('Error in sending transaction with Sdk:', error)
+      return { success: false, error: (error as Error).message }
+    }
   }
 }
 
