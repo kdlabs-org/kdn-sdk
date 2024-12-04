@@ -164,10 +164,6 @@ export class KadenaNamesSDK {
 
   /**
    * Creates a transaction for adding a new affiliate.
-   *
-   * This SDK function constructs a high-level interface for creating an unsigned
-   * transaction for adding an affiliate. The transaction must be signed and submitted separately.
-   *
    * @param affiliateName - The name of the affiliate.
    * @param feeAddress - The blockchain address where affiliate fees will be sent.
    * @param fee - The fee percentage to be allocated to the affiliate.
@@ -219,11 +215,6 @@ export class KadenaNamesSDK {
 
   /**
    * Creates a transaction for registering a Kadena name.
-   *
-   * This SDK function constructs a high-level interface for creating an unsigned
-   * transaction for registering a Kadena name. The transaction must be signed
-   * and submitted separately.
-   *
    * @param owner - The account that owns the name being registered.
    * @param address - The blockchain address to associate with the name.
    * @param name - The Kadena name to register (e.g., "example.kda").
