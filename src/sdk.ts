@@ -163,7 +163,7 @@ export class KadenaNamesSDK {
   }
 
   /**
-   * Prepares a transaction for adding a new affiliate.
+   * Creates a transaction for adding a new affiliate.
    *
    * This SDK function constructs a high-level interface for creating an unsigned
    * transaction for adding an affiliate. The transaction must be signed and submitted separately.
