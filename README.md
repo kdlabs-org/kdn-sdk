@@ -245,13 +245,11 @@ Retrieves the Kadena name associated with a specific blockchain address.
 - `address`: The Kadena blockchain address.
 - `networkId`: The network identifier.
 
-<<<<<<< Updated upstream
 
 ```typescript
 fetchSaleState(name: string, networkId: string): Promise<{ sellable: boolean; price: number }>
 ```
 
-=======
 **Returns:**
 A promise that resolves to:
 
@@ -263,7 +261,6 @@ A promise that resolves to:
 
 ### **fetchSaleState**
 
-> > > > > > > Stashed changes
 
 Fetches the sale state of a given Kadena name.
 
