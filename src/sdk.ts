@@ -10,18 +10,8 @@ import { PRICE_MAP } from './constants/kdn'
 import { ChainId, ICommand, IUnsignedCommand } from '@kadena/types'
 import { ITransactionDescriptor } from '@kadena/client'
 
-/**
- * Define a standardized SDK response type.
- */
-export interface SDKResponse<T> {
-  success: boolean
-  data?: T
-  error?: string
-}
+import type { SDKResponse } from './types/types'
 
-/**
- * The main SDK class for interacting with KadenaNames.
- */
 export class KadenaNamesSDK {
   private _chainwebHostGenerator: ChainwebHostGenerator
 
@@ -47,7 +37,7 @@ export class KadenaNamesSDK {
     const result = this._chainwebHostGenerator(options)
     if (!result) {
       throw new Error(
-        'Failed to generate Chainweb URL using chainwebHostGenerator method'
+        'Failed to generate Chainweb URL using chainwebHostGenerator method.'
       )
     }
     return result
@@ -67,10 +57,7 @@ export class KadenaNamesSDK {
     const host = this.getChainwebUrl({ networkId, chainId })
 
     const response = await service.nameToAddress(name, networkId, host)
-    if (response.success) {
-      return { success: true, data: response.data }
-    }
-    return { success: false, error: response.error }
+    return response
   }
 
   /**
@@ -87,10 +74,7 @@ export class KadenaNamesSDK {
     const host = this.getChainwebUrl({ networkId, chainId })
 
     const response = await service.addressToName(address, networkId, host)
-    if (response.success) {
-      return { success: true, data: response.data }
-    }
-    return { success: false, error: response.error }
+    return response
   }
 
   /**
@@ -107,10 +91,7 @@ export class KadenaNamesSDK {
     const host = this.getChainwebUrl({ networkId, chainId })
 
     const response = await service.fetchSaleState(name, networkId, host)
-    if (response.success) {
-      return { success: true, data: response.data }
-    }
-    return { success: false, error: response.error }
+    return response
   }
 
   /**
@@ -129,10 +110,7 @@ export class KadenaNamesSDK {
     const host = this.getChainwebUrl({ networkId, chainId })
 
     const response = await service.fetchNameInfo(name, networkId, owner, host)
-    if (response.success) {
-      return { success: true, data: response.data }
-    }
-    return { success: false, error: response.error }
+    return response
   }
 
   /**
@@ -156,10 +134,7 @@ export class KadenaNamesSDK {
       owner,
       host
     )
-    if (response.success) {
-      return { success: true, data: response.data }
-    }
-    return { success: false, error: response.error }
+    return response
   }
 
   /**
@@ -178,39 +153,14 @@ export class KadenaNamesSDK {
     adminKey: string,
     networkId: string
   ): SDKResponse<IUnsignedCommand> {
-    try {
-      const transaction = service.prepareAddAffiliateTransaction(
-        affiliateName,
-        feeAddress,
-        fee,
-        adminKey,
-        networkId
-      )
-
-      if (!transaction) {
-        return {
-          success: false,
-          error: `Failed to create a transaction for adding affiliate "${affiliateName}".`
-        }
-      }
-
-      return {
-        success: true,
-        data: transaction
-      }
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'An unexpected error occurred while creating the transaction.'
-
-      console.error('Error in createAddAffiliateTransaction:', errorMessage)
-
-      return {
-        success: false,
-        error: `Error creating transaction for affiliate "${affiliateName}": ${errorMessage}`
-      }
-    }
+    const response = service.prepareAddAffiliateTransaction(
+      affiliateName,
+      feeAddress,
+      fee,
+      adminKey,
+      networkId
+    )
+    return response
   }
 
   /**
@@ -229,46 +179,21 @@ export class KadenaNamesSDK {
     name: string,
     registrationPeriod: keyof typeof PRICE_MAP,
     networkId: string,
-    account: string
+    account?: string
   ): Promise<SDKResponse<IUnsignedCommand | null>> {
-    try {
-      const chainId = service.getChainIdByNetwork(networkId)
-      const host = this.getChainwebUrl({ networkId, chainId })
+    const chainId = service.getChainIdByNetwork(networkId)
+    const host = this.getChainwebUrl({ networkId, chainId })
 
-      const transaction = await service.prepareRegisterNameTransaction(
-        owner,
-        address,
-        name,
-        registrationPeriod,
-        networkId,
-        account,
-        host
-      )
-
-      if (!transaction) {
-        return {
-          success: false,
-          error: `Failed to create a transaction for registering name "${name}".`
-        }
-      }
-
-      return {
-        success: true,
-        data: transaction
-      }
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'An unexpected error occurred while creating the transaction.'
-
-      console.error('Error in createRegisterNameTransaction:', errorMessage)
-
-      return {
-        success: false,
-        error: `Error creating transaction for registering name "${name}": ${errorMessage}`
-      }
-    }
+    const response = await service.prepareRegisterNameTransaction(
+      owner,
+      address,
+      name,
+      registrationPeriod,
+      networkId,
+      host,
+      account
+    )
+    return response
   }
 
   /**
@@ -276,7 +201,7 @@ export class KadenaNamesSDK {
    * @param transaction - The signed transaction object.
    * @param networkId - The network identifier (e.g., 'testnet04', 'mainnet01').
    * @param chainId - The chain ID for the transaction (e.g., '1', '15').
-   * @returns A promise that resolves to a standardized SDK response containing the transaction descriptor.
+   * @returns A standardized SDK response containing the transaction descriptor.
    */
   async sendTransaction(
     transaction: ICommand,
@@ -288,7 +213,7 @@ export class KadenaNamesSDK {
       const result = await service.sendTransaction(transaction, host)
       return { success: true, data: result }
     } catch (error) {
-      console.error('Error in sending transaction with Sdk:', error)
+      console.error('Error in sendTransaction:', error)
       return { success: false, error: (error as Error).message }
     }
   }

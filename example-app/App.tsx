@@ -99,7 +99,7 @@ function App() {
     setError(null)
     setNameInfo(null)
 
-    const owner = 'owner-address' // Replace with actual owner address
+    const owner = 'owner-address'
 
     const response = await kadenaNames.fetchNameInfo(
       nameInput,
@@ -117,7 +117,7 @@ function App() {
     setError(null)
     setPriceByPeriod(null)
 
-    const owner = 'owner-address' // Replace with actual owner address
+    const owner = 'owner-address'
 
     const response = await kadenaNames.fetchPriceByPeriod(
       period,
@@ -141,23 +141,23 @@ function App() {
     setTransactionOutput(null)
 
     try {
-      const owner = 'owner-address' // Replace with actual owner address
-      const registrationPeriod = 1 // Defaulting to 1-year registration
-      const account = 'account-id' // Replace with actual account ID
+      const registrationPeriod = 1
 
-      const transaction = await kadenaNames.createRegisterNameTransaction(
-        owner,
-        addressInput,
-        nameInput,
-        registrationPeriod,
-        networkId,
-        account
-      )
+      const transactionResponse =
+        await kadenaNames.createRegisterNameTransaction(
+          addressInput,
+          addressInput,
+          nameInput,
+          registrationPeriod,
+          networkId
+        )
 
-      if (transaction) {
-        setTransactionOutput(JSON.stringify(transaction, null, 2))
+      if (transactionResponse.success && transactionResponse.data) {
+        setTransactionOutput(JSON.stringify(transactionResponse.data, null, 2))
       } else {
-        setError('Failed to prepare the transaction.')
+        setError(
+          transactionResponse.error || 'Failed to prepare the transaction.'
+        )
       }
     } catch (err) {
       setError((err as Error).message || 'An unexpected error occurred.')
@@ -174,10 +174,10 @@ function App() {
     setAffiliateTransactionOutput(null)
 
     try {
-      const fee = 5.0 // Example affiliate fee
-      const adminKey = 'admin-key' // Replace with actual admin key
+      const fee = 5.0
+      const adminKey = 'admin-key'
 
-      const transaction = kadenaNames.createAddAffiliateTransaction(
+      const transactionResponse = kadenaNames.createAddAffiliateTransaction(
         nameInput,
         addressInput,
         fee,
@@ -185,10 +185,15 @@ function App() {
         networkId
       )
 
-      if (transaction) {
-        setAffiliateTransactionOutput(JSON.stringify(transaction, null, 2))
+      if (transactionResponse.success && transactionResponse.data) {
+        setAffiliateTransactionOutput(
+          JSON.stringify(transactionResponse.data, null, 2)
+        )
       } else {
-        setError('Failed to prepare the affiliate transaction.')
+        setError(
+          transactionResponse.error ||
+            'Failed to prepare the affiliate transaction.'
+        )
       }
     } catch (err) {
       setError((err as Error).message || 'An unexpected error occurred.')

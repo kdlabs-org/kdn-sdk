@@ -56,3 +56,13 @@ export interface SaleState {
   sellable: boolean
   price: number
 }
+
+export interface SDKResponse<T> {
+  success: boolean
+  data?: T
+  error?: string
+}
+
+export type ServiceResponse<T> =
+  | { success: true; data: T }
+  | { success: false; error: string; data?: T }

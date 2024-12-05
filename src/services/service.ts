@@ -17,12 +17,8 @@ import { PRICE_MAP, VAULT } from '../constants/kdn'
 import { SaleState, NameInfo } from '../types/types'
 import { addExtentionToName } from '../utils/transform'
 
-/**
- * Standardized response type for service functions.
- */
-export type ServiceResponse<T> =
-  | { success: true; data: T }
-  | { success: false; error: string }
+import { ServiceError } from './error'
+import type { ServiceResponse } from '../types/types'
 
 /**
  * Determines the chain ID based on the network ID.
@@ -84,9 +80,13 @@ async function kdnResolver(
     return { success: true, data: result || null }
   } catch (error) {
     console.error(`Error in kdnResolver (${subject}):`, error)
+    const serviceError = new ServiceError(
+      `Failed to resolve ${subject} for identifier "${identifier}".`,
+      error instanceof Error ? error : undefined
+    )
     return {
       success: false,
-      error: `Failed to resolve ${subject} for identifier "${identifier}"`
+      error: serviceError.message
     }
   }
 }
@@ -157,13 +157,17 @@ export const fetchSaleState = async (
 
     const saleState = parseChainResponse<SaleState>(response, 'sale state')
     if (!saleState) {
-      throw new Error('Sale state parsing failed')
+      throw new ServiceError('Sale state parsing failed.')
     }
 
     return { success: true, data: saleState }
   } catch (error) {
     console.error('Error in fetchSaleState:', error)
-    return { success: false, error: 'Failed to fetch sale state' }
+    const serviceError = new ServiceError(
+      'Failed to fetch sale state.',
+      error instanceof Error ? error : undefined
+    )
+    return { success: false, error: serviceError.message }
   }
 }
 
@@ -240,7 +244,10 @@ export const fetchNameInfo = async (
       success: true,
       data: {
         ...result,
-        isAvailable: saleState.sellable,
+        isAvailable:
+          saleState.sellable === false && saleState.price === 0
+            ? result.isAvailable
+            : saleState.sellable,
         isForSale: saleState.sellable,
         price: saleState.price,
         marketPrice: saleState.price ?? result.lastPrice ?? 0,
@@ -249,9 +256,19 @@ export const fetchNameInfo = async (
     }
   } catch (error) {
     console.error('Error in fetchNameInfo:', error)
+    const serviceError = new ServiceError(
+      'Failed to fetch name information.',
+      error instanceof Error ? error : undefined
+    )
     return {
       success: false,
-      error: 'Failed to fetch name information'
+      error: serviceError.message,
+      data: {
+        isAvailable: false,
+        isForSale: false,
+        price: 0,
+        marketPrice: 0
+      }
     }
   }
 }
@@ -294,13 +311,17 @@ export const fetchPriceByPeriod = async (
 
     const price = parseChainResponse<number>(response, 'price')
     if (price === undefined || price === null) {
-      throw new Error('Price parsing failed')
+      throw new ServiceError('Price parsing failed.')
     }
 
     return { success: true, data: price }
   } catch (error) {
     console.error('Error in fetchPriceByPeriod:', error)
-    return { success: false, error: 'Failed to fetch price by period' }
+    const serviceError = new ServiceError(
+      'Failed to fetch price by period.',
+      error instanceof Error ? error : undefined
+    )
+    return { success: false, error: serviceError.message }
   }
 }
 
@@ -311,8 +332,7 @@ export const fetchPriceByPeriod = async (
  * @param fee - The fee percentage to be allocated to the affiliate.
  * @param adminKey - The governance key to authorize the operation.
  * @param networkId - The network identifier.
- * @param networkHost - The network host URL.
- * @returns The unsigned transaction JSON.
+ * @returns The unsigned transaction JSON or an error message.
  */
 export function prepareAddAffiliateTransaction(
   affiliateName: string,
@@ -320,30 +340,52 @@ export function prepareAddAffiliateTransaction(
   fee: number,
   adminKey: string,
   networkId: string
-): IUnsignedCommand {
-  const module = getNamespaceModule(networkId)
-  const chainId = getChainIdByNetwork(networkId)
+): ServiceResponse<IUnsignedCommand> {
+  try {
+    const module = getNamespaceModule(networkId)
+    const chainId = getChainIdByNetwork(networkId)
 
-  const transaction = Pact.builder
-    .execution(
-      (Pact as any).modules[module]['add-affiliate'](
-        affiliateName,
-        feeAddress,
-        fee
+    const transaction = Pact.builder
+      .execution(
+        (Pact as any).modules[module]['add-affiliate'](
+          affiliateName,
+          feeAddress,
+          fee
+        )
       )
-    )
-    .setMeta({
-      chainId,
-      senderAccount: adminKey,
-      gasLimit: 100000,
-      gasPrice: 0.001,
-      ttl: 600,
-      creationTime: Math.floor(Date.now() / 1000)
-    })
-    .setNetworkId(networkId)
-    .createTransaction()
+      .setMeta({
+        chainId,
+        senderAccount: adminKey,
+        gasLimit: 100000,
+        gasPrice: 0.001,
+        ttl: 600,
+        creationTime: Math.floor(Date.now() / 1000)
+      })
+      .setNetworkId(networkId)
+      .createTransaction()
 
-  return transaction
+    if (!transaction) {
+      return {
+        success: false,
+        error: `Failed to create a transaction for adding affiliate "${affiliateName}".`
+      }
+    }
+
+    return {
+      success: true,
+      data: transaction
+    }
+  } catch (error) {
+    console.error(`Error in prepareAddAffiliateTransaction:`, error)
+    const serviceError = new ServiceError(
+      `Error creating transaction for affiliate "${affiliateName}".`,
+      error instanceof Error ? error : undefined
+    )
+    return {
+      success: false,
+      error: serviceError.message
+    }
+  }
 }
 
 /**
@@ -360,8 +402,7 @@ export function prepareAddAffiliateTransaction(
  * @param networkId - The network identifier (e.g., "testnet04", "mainnet01").
  * @param account - The account performing the transaction.
  * @param networkHost - The Chainweb network host URL.
- * @returns An unsigned transaction ready to be signed and submitted.
- * @throws Will throw an error if fetching name info or price fails.
+ * @returns An unsigned transaction ready to be signed and submitted, or an error message.
  */
 export const prepareRegisterNameTransaction = async (
   owner: string,
@@ -369,55 +410,78 @@ export const prepareRegisterNameTransaction = async (
   name: string,
   registrationPeriod: keyof typeof PRICE_MAP,
   networkId: string,
-  account: string,
-  networkHost: string
-): Promise<IUnsignedCommand | null> => {
-  const days = PRICE_MAP[registrationPeriod]
+  networkHost: string,
+  account?: string
+): Promise<ServiceResponse<IUnsignedCommand | null>> => {
+  try {
+    const days = PRICE_MAP[registrationPeriod]
 
-  // Fetch current price for the name
-  const nameInfoResponse = await fetchNameInfo(
-    name,
-    networkId,
-    owner,
-    networkHost
-  )
-  if (!nameInfoResponse.success) {
-    throw new Error(
-      `Failed to fetch name info for "${name}": ${nameInfoResponse.error}`
+    // Fetch current price for the name
+    const nameInfoResponse = await fetchNameInfo(
+      name,
+      networkId,
+      owner,
+      networkHost
     )
-  }
-  const newPrice = nameInfoResponse.data.price
+    if (!nameInfoResponse.success) {
+      return {
+        success: false,
+        error: `Failed to fetch name info for "${name}": ${nameInfoResponse.error}`
+      }
+    }
+    const newPrice = nameInfoResponse.data.price
 
-  // Fetch stored price for the given period
-  const priceResponse = await fetchPriceByPeriod(
-    registrationPeriod,
-    networkId,
-    owner,
-    networkHost
-  )
-  if (!priceResponse.success) {
-    throw new Error(
-      `Failed to fetch price for period ${registrationPeriod}: ${priceResponse.error}`
+    // Fetch stored price for the given period
+    const priceResponse = await fetchPriceByPeriod(
+      registrationPeriod,
+      networkId,
+      owner,
+      networkHost
     )
+    if (!priceResponse.success) {
+      return {
+        success: false,
+        error: `Failed to fetch price for period ${registrationPeriod}: ${priceResponse.error}`
+      }
+    }
+    const storedPrice = priceResponse.data
+
+    // Determine the price to use for the transaction
+    const price =
+      newPrice > 0 && newPrice !== storedPrice ? newPrice : storedPrice
+
+    const transaction = createRegisterNameTransaction(
+      owner,
+      address,
+      name,
+      days,
+      price,
+      networkId,
+      account || ''
+    )
+
+    if (!transaction) {
+      return {
+        success: false,
+        error: `Failed to create a transaction for registering name "${name}".`
+      }
+    }
+
+    return {
+      success: true,
+      data: transaction
+    }
+  } catch (error) {
+    console.error('Error in prepareRegisterNameTransaction:', error)
+    const serviceError = new ServiceError(
+      'Failed to prepare register name transaction.',
+      error instanceof Error ? error : undefined
+    )
+    return {
+      success: false,
+      error: serviceError.message
+    }
   }
-  const storedPrice = priceResponse.data
-
-  // Determine the price to use for the transaction
-  const price =
-    newPrice > 0 && newPrice !== storedPrice ? newPrice : storedPrice
-
-  // Construct the transaction
-  const transaction = createRegisterNameTransaction(
-    owner,
-    address,
-    name,
-    days,
-    price,
-    networkId,
-    account
-  )
-
-  return transaction
 }
 
 /**
@@ -429,7 +493,6 @@ export const prepareRegisterNameTransaction = async (
  * @param price - The price to register the name.
  * @param networkId - The network identifier (e.g., 'testnet04', 'mainnet01').
  * @param account - The account signing the transaction.
- * @param networkHost - The Chainweb host URL.
  * @returns An unsigned transaction object to be signed by the wallet.
  */
 export function createRegisterNameTransaction(
@@ -441,40 +504,47 @@ export function createRegisterNameTransaction(
   networkId: string,
   account: string
 ): IUnsignedCommand {
-  const module = getNamespaceModule(networkId)
-  const chainId = getChainIdByNetwork(networkId)
-  const formattedName = addExtentionToName(name)
+  try {
+    const module = getNamespaceModule(networkId)
+    const chainId = getChainIdByNetwork(networkId)
+    const formattedName = addExtentionToName(name)
 
-  const transaction = Pact.builder
-    .execution(
-      (Pact as any).modules[module].register(
-        owner,
-        address,
-        formattedName,
-        { int: days },
-        ''
+    const transaction = Pact.builder
+      .execution(
+        (Pact as any).modules[module].register(
+          owner,
+          address,
+          formattedName,
+          { int: days },
+          ''
+        )
       )
-    )
-    .addSigner(account, (withCapability: any) => [
-      withCapability('coin.GAS'),
-      withCapability('coin.TRANSFER', owner, VAULT, price),
-      withCapability(`${module}.ACCOUNT_GUARD`, owner)
-    ])
-    .setMeta({
-      chainId,
-      senderAccount: owner
-    })
-    .setNetworkId(networkId)
-    .createTransaction()
+      .addSigner(account, (withCapability: any) => [
+        withCapability('coin.GAS'),
+        withCapability('coin.TRANSFER', owner, VAULT, price),
+        withCapability(`${module}.ACCOUNT_GUARD`, owner)
+      ])
+      .setMeta({
+        chainId,
+        senderAccount: owner
+      })
+      .setNetworkId(networkId)
+      .createTransaction()
 
-  return transaction
+    return transaction
+  } catch (error) {
+    console.error('Error in createRegisterNameTransaction:', error)
+    throw new ServiceError(
+      'Failed to create register name transaction.',
+      error instanceof Error ? error : undefined
+    )
+  }
 }
 
 /**
  * Sends a signed transaction to the Kadena blockchain.
  * @param transaction - The signed transaction object.
- * @param networkId - The network identifier (e.g., 'testnet04', 'testnet05', 'mainnet01').
- * @param host - The Chainweb host URL for the specified network.
+ * @param networkHost - The Chainweb host URL for the specified network.
  * @returns A promise that resolves to the transaction descriptor, containing details of the submitted transaction.
  */
 export async function sendTransaction(

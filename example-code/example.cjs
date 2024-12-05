@@ -3,7 +3,7 @@
 // async function run() {
 //   const name = 'examplename.kda';
 //   const networkId = 'testnet04';
-//   const owner = 'owner-address'; // Replace with the actual owner address
+//   const owner = 'owner-address';
 
 //   try {
 //     // Convert name to address
@@ -100,6 +100,36 @@
 //         `Error fetching 2-year price: ${priceForTwoYearsResponse.error}`
 //       );
 //     }
+    
+//     const registrationTransactionResponse = await kadenaNames.createRegisterNameTransaction(
+//       owner,
+//       'address-input', 
+//       name,
+//       1, 
+//       networkId,
+//       'affiliateId'l
+//     );
+
+//     if (registrationTransactionResponse.success && registrationTransactionResponse.data) {
+//       console.log('Registration Transaction:', JSON.stringify(registrationTransactionResponse.data, null, 2));
+//     } else {
+//       console.error(`Error preparing registration transaction: ${registrationTransactionResponse.error}`);
+//     }
+
+//     const affiliateTransactionResponse = kadenaNames.createAddAffiliateTransaction(
+//       'affiliate-name',
+//       'fee-address',    
+//       5.0,              
+//       'admin-key',     
+//       networkId
+//     );
+
+//     if (affiliateTransactionResponse.success && affiliateTransactionResponse.data) {
+//       console.log('Affiliate Transaction:', JSON.stringify(affiliateTransactionResponse.data, null, 2));
+//     } else {
+//       console.error(`Error preparing affiliate transaction: ${affiliateTransactionResponse.error}`);
+//     }
+
 //   } catch (error) {
 //     console.error('An unexpected error occurred:', error);
 //   }
