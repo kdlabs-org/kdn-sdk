@@ -1,5 +1,5 @@
 {
-  "name": "kdn-sdk",
+  "name": "kadena-names",
   "version": "1.1.1",
   "description": "A TypeScript SDK for integrating human-readable addresses with KadenaNames on the Kadena blockchain.",
   "main": "dist/cjs/index.js",

@@ -50,19 +50,19 @@ Install the KadenaNames SDK via your preferred package manager:
 ### Using `npm`:
 
 ```bash
-npm install kdn-sdk
+npm install @kdlabs/kadenanames
 ```
 
 ### Using `yarn`:
 
 ```bash
-yarn add kdn-sdk
+yarn add @kdlabs/kadenanames
 ```
 
 ### Using `pnpm`:
 
 ```bash
-pnpm add kdn-sdk
+pnpm add @kdlabs/kadenanames
 ```
 
 ---
@@ -72,7 +72,7 @@ pnpm add kdn-sdk
 ### Import the SDK
 
 ```typescript
-import { kadenaNames } from 'kdn-sdk'
+import { kadenaNames } from '@kdlabs/kadenanames'
 ```
 
 ### `nameToAddress`
