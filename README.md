@@ -1,12 +1,41 @@
-# KadenaNames SDK
+# KadenaNames SDK Documentation
+
+Welcome to the **KadenaNames SDK**—a comprehensive solution for integrating human-readable addresses on the Kadena blockchain. This SDK is meticulously designed to enhance developer convenience and elevate user experiences by enabling the creation of more intuitive and accessible decentralized applications (dApps).
+
+## Table of Contents
+
+- [Introduction](#introduction)
+  - [What is KadenaNames?](#what-is-kadenanames)
+  - [Why KadenaNames?](#why-kadenanames)
+  - [How Does It Work?](#how-does-it-work)
+- [Key Benefits](#key-benefits)
+- [Installation](#installation)
+- [Getting Started](#getting-started)
+- [Core Features](#core-features)
+  - [Name Resolution](#name-resolution)
+    - [`nameToAddress`](#nametoaddress)
+    - [`addressToName`](#addresstoname)
+  - [Sale State Management](#sale-state-management)
+    - [`fetchSaleState`](#fetchsalestate)
+    - [`fetchNameInfo`](#fetchnameinfo)
+    - [`fetchPriceByPeriod`](#fetchpricebyperiod)
+  - [Transaction Management](#transaction-management)
+    - [`createRegisterNameTransaction`](#createregisternametransaction)
+    - [`sendTransaction`](#sendtransaction)
+- [Error Handling](#error-handling)
+- [Advanced Usage](#advanced-usage)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
+- [Additional Resources](#additional-resources)
+
+---
 
 ## Introduction
 
-Welcome to the **KadenaNames SDK**—a straightforward solution for integrating human-readable addresses on the Kadena blockchain. Designed for developer convenience and enhanced user experience, KadenaNames enables you to create more intuitive and accessible decentralized applications (dApps).
-
 ### What is KadenaNames?
 
-KadenaNames is a decentralized, on-chain service that provides human-readable names on the Kadena blockchain. Leveraging the capabilities of Pact smart contracts, KadenaNames ensures a secure and user-friendly experience by verifying the authenticity and ownership of each name.
+KadenaNames is a decentralized, on-chain service that provides human-readable names on the Kadena blockchain. Utilizing the power of Pact smart contracts, KadenaNames ensures a secure and user-friendly experience by verifying the authenticity and ownership of each name.
 
 ### Why KadenaNames?
 
@@ -14,7 +43,7 @@ KadenaNames is a decentralized, on-chain service that provides human-readable na
 - **Increased Accessibility**: Make your dApps more approachable, attracting a broader user base.
 - **Security and Trust**: Built on Kadena’s secure and scalable blockchain, ensuring reliability and integrity.
 - **Comprehensive Error Handling**: Receive standardized responses with detailed error messages for seamless integration.
-- **TypeScript Support**: Enjoy type safety and improved developer experience with full TypeScript support.
+- **TypeScript Support**: Enjoy type safety and an improved developer experience with full TypeScript support.
 
 ### How Does It Work?
 
@@ -32,7 +61,7 @@ These functionalities are encapsulated within the KadenaNames SDK, providing dev
 
 ---
 
-## Features
+## Key Benefits
 
 - **TypeScript Support**: Fully typed for enhanced developer experience and type safety.
 - **Standardized Responses**: Consistent response structure across all SDK methods for predictable error handling.
@@ -67,15 +96,52 @@ pnpm add @kdlabs/kadenanames
 
 ---
 
-## Usage
+## Getting Started
 
 ### Import the SDK
+
+Begin by importing the `kadenaNames` instance from the KadenaNames SDK:
 
 ```typescript
 import { kadenaNames } from '@kdlabs/kadenanames'
 ```
 
-### `nameToAddress`
+### Basic Usage Example
+
+Here's a simple example demonstrating how to convert a name to an address and vice versa:
+
+```typescript
+async function exampleUsage() {
+  // Convert name to address
+  const nameResponse = await kadenaNames.nameToAddress('alice.kda', 'testnet04')
+  if (nameResponse.success && nameResponse.data) {
+    console.log(`Address: ${nameResponse.data}`)
+  } else {
+    console.error(`Error: ${nameResponse.error}`)
+  }
+
+  // Convert address to name
+  const addressResponse = await kadenaNames.addressToName(
+    'k:123456789abcdef',
+    'testnet04'
+  )
+  if (addressResponse.success && addressResponse.data) {
+    console.log(`Name: ${addressResponse.data}`)
+  } else {
+    console.error(`Error: ${addressResponse.error}`)
+  }
+}
+
+exampleUsage()
+```
+
+---
+
+## Core Features
+
+### Name Resolution
+
+#### `nameToAddress`
 
 Converts a Kadena name to its corresponding blockchain address.
 
@@ -92,7 +158,19 @@ function nameToAddress(
 }>
 ```
 
-**Usage Example:**
+**Parameters:**
+
+- `name`: `string`  
+  The Kadena name to resolve (e.g., `'alice.kda'`).
+- `networkId`: `string`  
+  The network ID (e.g., `'testnet04'`, `'mainnet01'`).
+
+**Returns:**
+
+- `Promise<{ success: boolean; data?: string | null; error?: string }>`  
+  An object indicating the success status, the resolved address if successful, or an error message.
+
+**Example:**
 
 ```typescript
 const response = await kadenaNames.nameToAddress('alice.kda', 'testnet04')
@@ -103,7 +181,9 @@ if (response.success && response.data) {
 }
 ```
 
-### `addressToName`
+---
+
+#### `addressToName`
 
 Retrieves the Kadena name associated with a specific blockchain address.
 
@@ -120,7 +200,19 @@ function addressToName(
 }>
 ```
 
-**Usage Example:**
+**Parameters:**
+
+- `address`: `string`  
+  The Kadena address to resolve (e.g., `'k:123456789abcdef'`).
+- `networkId`: `string`  
+  The network ID.
+
+**Returns:**
+
+- `Promise<{ success: boolean; data?: string | null; error?: string }>`  
+  An object indicating the success status, the resolved name if successful, or an error message.
+
+**Example:**
 
 ```typescript
 const response = await kadenaNames.addressToName(
@@ -134,7 +226,11 @@ if (response.success && response.data) {
 }
 ```
 
-### `fetchSaleState`
+---
+
+### Sale State Management
+
+#### `fetchSaleState`
 
 Fetches the sale state of a given Kadena name.
 
@@ -154,7 +250,19 @@ function fetchSaleState(
 }>
 ```
 
-**Usage Example:**
+**Parameters:**
+
+- `name`: `string`  
+  The Kadena name to check (e.g., `'example.kda'`).
+- `networkId`: `string`  
+  The network ID.
+
+**Returns:**
+
+- `Promise<{ success: boolean; data?: { sellable: boolean; price: number }; error?: string }>`  
+  An object indicating the success status, sale state data if successful, or an error message.
+
+**Example:**
 
 ```typescript
 const response = await kadenaNames.fetchSaleState('example.kda', 'testnet04')
@@ -169,7 +277,9 @@ if (response.success && response.data) {
 }
 ```
 
-### `fetchNameInfo`
+---
+
+#### `fetchNameInfo`
 
 Fetches detailed information about a Kadena name.
 
@@ -193,13 +303,27 @@ function fetchNameInfo(
 }>
 ```
 
-**Usage Example:**
+**Parameters:**
+
+- `name`: `string`  
+  The Kadena name to query (e.g., `'example.kda'`).
+- `networkId`: `string`  
+  The network ID.
+- `owner`: `string`  
+  The address of the owner (e.g., `'k:ownerPublicKey'`).
+
+**Returns:**
+
+- `Promise<{ success: boolean; data?: { price: number; marketPrice: number; isAvailable: boolean; isForSale: boolean; expiryDate?: number }; error?: string }>`  
+  An object indicating the success status, name information if successful, or an error message.
+
+**Example:**
 
 ```typescript
 const response = await kadenaNames.fetchNameInfo(
   'example.kda',
   'testnet04',
-  'owner-address'
+  'k:ownerPublicKey'
 )
 if (response.success && response.data) {
   console.log('Name Info:', response.data)
@@ -208,7 +332,9 @@ if (response.success && response.data) {
 }
 ```
 
-### `fetchPriceByPeriod`
+---
+
+#### `fetchPriceByPeriod`
 
 Fetches the registration price for a specific period (1 or 2 years).
 
@@ -226,13 +352,27 @@ function fetchPriceByPeriod(
 }>
 ```
 
-**Usage Example:**
+**Parameters:**
+
+- `period`: `1 | 2`  
+  The registration period in years (1 or 2).
+- `networkId`: `string`  
+  The network ID.
+- `owner`: `string`  
+  The address of the owner (e.g., `'k:ownerPublicKey'`).
+
+**Returns:**
+
+- `Promise<{ success: boolean; data?: number; error?: string }>`  
+  An object indicating the success status, the price if successful, or an error message.
+
+**Example:**
 
 ```typescript
 const response = await kadenaNames.fetchPriceByPeriod(
   1,
   'testnet04',
-  'owner-address'
+  'k:ownerPublicKey'
 )
 if (response.success && response.data !== undefined) {
   console.log(`Price for 1 year: ${response.data}`)
@@ -241,7 +381,11 @@ if (response.success && response.data !== undefined) {
 }
 ```
 
-### `createRegisterNameTransaction`
+---
+
+### Transaction Management
+
+#### `createRegisterNameTransaction`
 
 Prepares an unsigned transaction for registering a Kadena name.
 
@@ -262,16 +406,36 @@ function createRegisterNameTransaction(
 }>
 ```
 
-**Usage Example:**
+**Parameters:**
+
+- `owner`: `string`  
+  The address of the owner registering the name (e.g., `'k:ownerPublicKey'`).
+- `address`: `string`  
+  The blockchain address associated with the name.
+- `name`: `string`  
+  The Kadena name to register (e.g., `'example.kda'`).
+- `registrationPeriod`: `1 | 2`  
+  The registration period in years (1 or 2).
+- `networkId`: `string`  
+  The network ID.
+- `account?`: `string`  
+  (Optional) The signer account for the transaction.
+
+**Returns:**
+
+- `Promise<{ success: boolean; data?: IUnsignedCommand | null; error?: string }>`  
+  An object indicating the success status, the unsigned transaction if successful, or an error message.
+
+**Example:**
 
 ```typescript
 const response = await kadenaNames.createRegisterNameTransaction(
-  'owner-address', // Replace with actual owner address
-  'owner-address', // Replace with actual address
-  'example.kda',
+  'k:ownerPublicKey', // Owner address
+  'k:ownerPublicKey', // Associated address
+  'example.kda', // Name to register
   1, // 1-year registration
-  'testnet04',
-  'signer-account' // Replace with actual signer account
+  'testnet04', // Network ID
+  'signerAccount' // Signer account (optional)
 )
 
 if (response.success && response.data) {
@@ -284,7 +448,9 @@ if (response.success && response.data) {
 }
 ```
 
-### `sendTransaction`
+---
+
+#### `sendTransaction`
 
 Submits a signed transaction to the Kadena blockchain.
 
@@ -302,7 +468,21 @@ function sendTransaction(
 }>
 ```
 
-**Usage Example:**
+**Parameters:**
+
+- `transaction`: `ICommand`  
+  The signed transaction command.
+- `networkId`: `string`  
+  The network ID (e.g., `'testnet04'`, `'mainnet01'`).
+- `chainId`: `string`  
+  The chain ID where the transaction will be executed.
+
+**Returns:**
+
+- `Promise<{ success: boolean; data?: ITransactionDescriptor; error?: string }>`  
+  An object indicating the success status, the transaction descriptor if successful, or an error message.
+
+**Example:**
 
 ```typescript
 try {
@@ -351,6 +531,76 @@ This standardized approach ensures that you can handle both successes and failur
 
 ---
 
+## Advanced Usage
+
+### Customizing Chainweb Hosts
+
+By default, the KadenaNames SDK connects to standard Chainweb hosts. However, you can customize the Chainweb host generators to support various networks or configurations as needed.
+
+**Example:**
+
+```typescript
+import { kadenaNames, createCustomChainwebHost } from '@kdlabs/kadenanames'
+
+// Create a custom Chainweb host
+const customHost = createCustomChainwebHost('https://custom.chainweb.host')
+
+// Use the custom host with KadenaNames
+kadenaNames.setChainwebHost(customHost)
+```
+
+### Handling Transactions
+
+Managing transactions involves creating unsigned transactions, signing them securely, and then sending them to the network. Ensure that you handle private keys and signing processes securely within your application.
+
+**Example Workflow:**
+
+1. **Create an Unsigned Transaction:**
+
+   ```typescript
+   const registerResponse = await kadenaNames.createRegisterNameTransaction(
+     'k:ownerPublicKey',
+     'k:ownerPublicKey',
+     'example.kda',
+     1,
+     'testnet04',
+     'signerAccount'
+   )
+
+   if (!registerResponse.success || !registerResponse.data) {
+     throw new Error(registerResponse.error)
+   }
+
+   const unsignedTransaction = registerResponse.data
+   ```
+
+2. **Sign the Transaction:**
+
+   Implement your signing mechanism based on your wallet or security requirements. This step is highly dependent on your application's architecture and security practices.
+
+   ```typescript
+   // Example signing function (implementation dependent)
+   const signedTransaction = signTransaction(unsignedTransaction)
+   ```
+
+3. **Send the Signed Transaction:**
+
+   ```typescript
+   const sendResponse = await kadenaNames.sendTransaction(
+     signedTransaction,
+     'testnet04',
+     '15' // Example chain ID
+   )
+
+   if (sendResponse.success && sendResponse.data) {
+     console.log('Transaction Descriptor:', sendResponse.data)
+   } else {
+     console.error(`Error: ${sendResponse.error}`)
+   }
+   ```
+
+---
+
 ## Contributing
 
 Contributions are welcome! Please follow these steps to contribute to the KadenaNames SDK:
@@ -396,7 +646,3 @@ For any inquiries or support, please reach out to **info@kdlaunch.com**.
 
 - **Support**: Join our [Discord](https://discord.gg/kdlabs) or follow us on [Twitter](https://twitter.com/kd_labs) for the latest updates and support.
 - **Changelog**: Refer to the [CHANGELOG](./CHANGELOG.md) for a detailed history of updates and changes.
-
----
-
-By integrating the KadenaNames SDK into your projects, you enhance the usability and accessibility of your dApps, making blockchain interactions smoother and more intuitive for your users. Happy developing!
