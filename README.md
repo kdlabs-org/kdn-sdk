@@ -23,7 +23,6 @@ Welcome to the **KadenaNames SDK**—a comprehensive solution for integrating hu
     - [`createRegisterNameTransaction`](#createregisternametransaction)
     - [`sendTransaction`](#sendtransaction)
 - [Error Handling](#error-handling)
-- [Advanced Usage](#advanced-usage)
 - [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
@@ -530,24 +529,6 @@ if (response.success && response.data) {
 This standardized approach ensures that you can handle both successes and failures uniformly across your application.
 
 ---
-
-## Advanced Usage
-
-### Customizing Chainweb Hosts
-
-By default, the KadenaNames SDK connects to standard Chainweb hosts. However, you can customize the Chainweb host generators to support various networks or configurations as needed.
-
-**Example:**
-
-```typescript
-import { kadenaNames, createCustomChainwebHost } from '@kdlabs/kadenanames'
-
-// Create a custom Chainweb host
-const customHost = createCustomChainwebHost('https://custom.chainweb.host')
-
-// Use the custom host with KadenaNames
-kadenaNames.setChainwebHost(customHost)
-```
 
 ### Handling Transactions
 
